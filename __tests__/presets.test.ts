@@ -98,4 +98,18 @@ describe("react", () => {
     expect(lint("react", "react-refresh-valid.tsx")).toEqual([]);
     expect(lint("react", "react-refresh-constant.tsx")).toEqual([]);
   });
+
+  it("accepts a dependency listed only to re-run an effect", () => {
+    expect(lint("react", "react-hooks-trigger-valid.tsx")).toEqual([]);
+  });
+
+  // Route files keep their components local (the router hot-reloads them) and
+  // tests never hot-reload at all.
+  it("leaves route files and tests out of the fast-refresh check", () => {
+    const rule = "lint/style/useComponentExportOnlyModules";
+    expect(lint("react", "route-shaped.tsx")).toContain(rule);
+    expect(lint("react", "routes/page.tsx")).not.toContain(rule);
+    expect(lint("react", "harness-shaped.tsx")).toContain(rule);
+    expect(lint("react", "harness.test.tsx")).not.toContain(rule);
+  });
 });
