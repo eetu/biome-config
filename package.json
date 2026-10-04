@@ -1,6 +1,6 @@
 {
   "name": "@anarkisti/biome-config",
-  "version": "1.0.0",
+  "version": "1.0.0-rc.1",
   "description": "Shared Biome configuration for Node, React and plain web projects",
   "license": "MIT",
   "repository": {
