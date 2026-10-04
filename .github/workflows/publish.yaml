@@ -1,0 +1,34 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    name: "Publish to npm"
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+      - name: Verify tag is on main
+        run: git merge-base --is-ancestor ${{ github.sha }} origin/main
+      - name: Verify tag matches package.json version
+        run: test "v$(node -p "require('./package.json').version")" = "${{ github.ref_name }}"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "lts/*"
+      - run: corepack enable
+      - run: yarn install
+      - name: Publish
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if [[ "$VERSION" == *-* ]]; then TAG=rc; else TAG=latest; fi
+          npm publish --provenance --access public --tag "$TAG"
